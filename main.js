@@ -37,13 +37,17 @@ Ball.prototype.pop = function(index){
   // }
   balls.splice(index, 1);
 
+  let angle = 0;
+
   for(let i=0; i<this.balls.length; i++){
-    this.balls[i].x = this.x;
-    this.balls[i].y = this.y;
+    this.balls[i].x = this.x + (((this.size) + this.balls[i].size) * Math.cos(angle));
+    this.balls[i].y = this.y + (((this.size) + this.balls[i].size) * Math.sin(angle));
     this.balls[i].immune = true;
     balls.push(this.balls[i]);
+    angle += (2*Math.PI) / this.balls.length;
   }
-  // console.log("popped")
+  
+  
 }
 
 Ball.prototype.update = function(){
