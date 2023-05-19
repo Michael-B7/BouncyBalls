@@ -21,7 +21,6 @@ function Ball(x, y, velX, velY, color, size) {
   this.color = color;
   this.size = size;
   this.balls = [];
-  this.immune = false;
 }
 
 Ball.prototype.draw = function(){
@@ -42,7 +41,6 @@ Ball.prototype.pop = function(index){
   for(let i=0; i<this.balls.length; i++){
     this.balls[i].x = this.x + (((this.size) + this.balls[i].size) * Math.cos(angle));
     this.balls[i].y = this.y + (((this.size) + this.balls[i].size) * Math.sin(angle));
-    this.balls[i].immune = true;
     balls.push(this.balls[i]);
     angle += (2*Math.PI) / this.balls.length;
   }
@@ -67,8 +65,22 @@ Ball.prototype.update = function(){
     this.velY = -(this.velY);
   }
 
+  this.limitVel(7);
+
   this.x += this.velX;
   this.y += this.velY;
+}
+
+Ball.prototype.limitVel = function(limit){
+  if(this.velX > limit){
+    this.velX = limit;
+  }else if(this.velX < -limit){
+    this.velX = -limit;
+  }else if(this.velY > limit){
+    this.velY = limit;
+  }else if(this.velY < -limit){
+    this.velY = -limit;
+  }
 }
 
 Ball.prototype.collisionDetect = function(index) {
@@ -79,26 +91,22 @@ Ball.prototype.collisionDetect = function(index) {
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (distance < this.size + balls[j].size) {
-        if(balls[j].immune){
-          return;
-        }
         balls[j].color = this.color = 'rgb(' + random(0, 255) + ',' + random(0, 255) + ',' + random(0, 255) +')';
         if(this.size > balls[j].size){
-          this.size += balls[j].size/4;
+          this.size += balls[j].size;
           this.balls.push(balls[j])
           if(this.size > 50){
-            console.log(this.size)
             this.pop(index);
             // console.log("popped")
+
           }
           balls.splice(j, 1);
           // console.log("removed")
           return;
         }else{
-          balls[j].size += this.size/4;
+          balls[j].size += this.size;
           balls[j].balls.push(this);
           if(balls[j].size > 50){
-            console.log(balls[j].size)
             balls[j].pop(j);
             // console.log("popped")
           }
@@ -106,8 +114,6 @@ Ball.prototype.collisionDetect = function(index) {
           // console.log("removed")
           return;
         }        
-      }else{
-        this.immune = false;
       }
     }
   }
